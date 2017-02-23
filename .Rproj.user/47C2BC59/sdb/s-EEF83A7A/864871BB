@@ -1,0 +1,29 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1486240341664.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "864871BB",
+    "lastKnownWriteTime" : 288232575174967296,
+    "last_content_update" : 1486240341664,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "DEFEC5E",
+        "caption" : "allOMZcruises",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=allOMZcruises&cache_key=DEFEC5E",
+        "displayedObservations" : "4936",
+        "environment" : "",
+        "object" : "allOMZcruises",
+        "preview" : "0",
+        "totalObservations" : "4936",
+        "variables" : "21"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
