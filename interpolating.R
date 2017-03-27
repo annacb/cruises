@@ -32,11 +32,13 @@ approx(xy.coords(cruisesALL1$depth, cruisesALL1$O2), xout = stdDepths, method = 
 ?ddply
 head(cruisesALLm)
 
-interp <- ddply(.data = cruisesALLm, .variables = c('cruise', 'station', 'depth'), .fun = approx(xy.coords('depth', 'value')), .inform = TRUE)
+interp <- ddply(.data = cruisesALLn, .variables = c('cruise', 'station', 'variable'), .fun = approx(xy.coords(df$depth, df$value)), .inform = TRUE)
 
 cruisesALLn <- na.omit(cruisesALLm)
 
-interp <- ddply(.data = cruisesALLn, .variables = c('cruise', 'station', 'variable'), function(df) try(approx(xy.coords(df$depth, df$value))), .inform = TRUE)
+interp <- ddply(.data = cruisesALLn, .variables = c('cruise', 'station', 'variable'), function(df) approx(xy.coords(df$depth, df$value)), .inform = TRUE)
+
+?approx
 interp
 ?try
 
@@ -46,6 +48,9 @@ nrow(cruisesALLm)
 approxR <- function(df) {
   if (nrow(df) >= 2) {
     approx(xy.coords(df$depth, df$value))
+  }
+  else { 
+    return('err')
   }
 }
 
