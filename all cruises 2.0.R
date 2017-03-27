@@ -9,7 +9,15 @@ cruisesDataFrame <- data.frame(allOMZcruises)
 cruises <- subset(cruisesDataFrame, select = -c(date, time, bottDepth))
 head(cruises)
 View(cruises)
+str(cruises)
 
+TGT <- subset(cruises, cruise == 'TGT66')
+TGT
+
+plot(TGT$NO2, TGT$depth)
+
+
+ggplot(TGT, aes(depth, NO2, group = station)) + geom_line(color = 'lightslateblue') + coord_flip() + scale_x_reverse()
 
 #FIXED allOMZcruises TO INCLUDE 2012 DEPTH!!! 1 db = 1 m ###########
 cruises[1828,] #looking for start of TN278 cruise (2012 cruise)
@@ -29,10 +37,11 @@ length(cruises4$cruise) == (4936 - 3109) + 140
 
 
 # ADDING IN 2016 TEMP/SAL/... DATA ###############################
-cruises2016df <- data.frame(skq2016combined)
-cruises16 <- subset(cruises2016df, select = -c(date, time, bottDepth))
+head(skq2016combined)
+cruises16 <- subset(skq2016combined, select = -c(date, time, bottDepth))
 cruisesALL <- rbind(cruises, cruises16)  
 attach(cruisesALL)
+str(cruisesALL)
 View(cruises16)
 View(cruisesALL)
 ##################################################################
@@ -43,11 +52,12 @@ View(cruisesALL)
 
 #trying to make ggplot plot in the order i want... YAY! it works :)
 cruisesALL$cruise <- factor(cruisesALL$cruise, levels=unique(cruisesALL$cruise))
+cruises$cruise <- factor(cruises$cruise, levels=unique(cruises$cruise))
 head(cruisesALL)
 
 str(cruises)
 levels(cruises$cruise)
-pdf("all but 2016 v2.pdf", width=7, height=5) 
+pdf("all but 2016 v3.pdf", width=7, height=5) 
 #OXYGEN
 #O2log <- log10(O2) # + scale_y_log10() +
 
@@ -63,13 +73,13 @@ ggplot(subset(cruises, !is.na(cruise)), aes(depth, PO4, group = station)) + geom
 ggplot(subset(cruises, !is.na(cruise)), aes(depth, SiO4, group = station)) + geom_line(color = 'azure3') + coord_flip() + facet_wrap('cruise', nrow = 2) + scale_x_reverse()
 
 #NITRITE
-ggplot(subset(cruisesALL, !is.na(cruise)), aes(depth, NO2, group = station)) + geom_line(color = 'darkorange3') + coord_flip() + facet_wrap('cruise', nrow = 2) + scale_x_reverse() + xlim(1000, 0)
+ggplot(subset(cruisesALL, !is.na(cruise) & !is.na(NO2)), aes(depth, NO2, group = station)) + geom_line(color = 'darkorange3') + coord_flip() + facet_wrap('cruise', nrow = 2) + scale_x_reverse() + xlim(1000, 0)
 
 #NITRATE
 ggplot(subset(cruises, !is.na(cruise)), aes(depth, NO3, group = station)) + geom_line(color = 'goldenrod1') + coord_flip() + facet_wrap('cruise', nrow = 2) + scale_x_reverse() + xlim(1000, 0)
 
 #AMMONIUM
-ggplot(subset(cruises, !is.na(cruise)), aes(depth, NH4, group = station)) + geom_line(color = 'chartreuse1') + coord_flip() + facet_wrap('cruise', nrow = 2) + scale_x_reverse()
+ggplot(subset(cruisesALL, !is.na(cruise) & !is.na(NO2)), aes(depth, NH4, group = station)) + geom_line(color = 'chartreuse1') + coord_flip() + facet_wrap('cruise', nrow = 2) + scale_x_reverse()
 
 #TEMP
 ggplot(subset(cruisesALL, !is.na(cruise)), aes(depth, temp, group = station)) + geom_line(color = 'yellowgreen') + coord_flip() + facet_wrap('cruise', nrow = 2) + scale_x_reverse()
