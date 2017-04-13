@@ -28,42 +28,19 @@ length(cruisesALL1$cruise)
 approx(xy.coords(cruisesALL1$depth, cruisesALL1$O2), xout = stdDepths, method = 'linear')
 #i think its working..
 #package: plyr
-?approx
-?ddply
-head(cruisesALLm)
-
-interp <- ddply(.data = cruisesALLn, .variables = c('cruise', 'station', 'variable'), .fun = approx(xy.coords(df$depth, df$value)), .inform = TRUE)
 
 cruisesALLn <- na.omit(cruisesALLm)
 
-interp <- ddply(.data = cruisesALLn, .variables = c('cruise', 'station', 'variable'), function(df) approx(xy.coords(df$depth, df$value)), .inform = TRUE)
+interp <- ddply(.data = cruisesALLn, .variables = c('cruise', 'station', 'variable'), function(df) approxR(df), .inform = TRUE)
+head(interp)
 
-?approx
-interp
-?try
-
-options(error = NULL)
-nrow(cruisesALLm)
 
 approxR <- function(df) {
   if (nrow(df) >= 2) {
-    approx(xy.coords(df$depth, df$value))
-  }
-  else { 
-    return('err')
+    listResult <-  approx(xy.coords(df$depth, df$value), xout = stdDepths, method = 'linear')
+    data.frame(DepthBin = listResult$x, value = listResult$y)
   }
 }
 
-interp <- ddply(.data = cruisesALLn, .variables = c('cruise', 'station', 'variable'), function(df) approxR(df), .inform = TRUE)
 
-
-unique(cruisesALL0$station)
-#ugh what is this error...
-#renaming 034a to 034.. jk idk how
-head(cruisesALLm)
-
-interp <- ddply(.data = cruisesALLm, .variables = c(cruise, station, depth), .fun = approx(xy.coords(depth, value)))
-#AHHH :(
-
-write.csv(cruisesALLm, "cruisesALLm.csv")
-
+View(interp)
