@@ -128,7 +128,7 @@ ODZdepths <- ddply(.data = avgO2, .variables = c('cruise'), function(df) ODZdept
 
 hlineO2 <- data.frame(z = c(ODZdepths$topODZ, ODZdepths$bottODZ), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16', 'TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
 
-ggplot() + geom_line(aes(DepthBin, value, group = station), data = O2data, col = 'skyblue1') + facet_wrap('cruise', nrow = 2) + geom_line(data = avgO2, aes(DepthBin, V1), color = 'darkblue', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineO2, lty = 5) + scale_x_reverse(limits = c(1250, 0), breaks = seq(from = 0, to = 1250, by = 250), name = 'Depth (m)') + scale_y_continuous(name = '[O2] umol', limits = c(0, 225), breaks = seq(from = 0, to = 225, by = 75)) + coord_flip() + ggtitle("ETNP Oxygen Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
+ggplot() + geom_line(aes(DepthBin, value, group = station), data = O2data, col = 'skyblue1') + facet_wrap('cruise', nrow = 2) + geom_line(data = avgO2, aes(DepthBin, V1), color = 'darkblue', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineO2, lty = 5) + scale_x_reverse(limits = c(1250, 0), breaks = seq(from = 0, to = 1250, by = 250), name = 'Depth (m)') + scale_y_continuous(name = '[O2] umol/kg', limits = c(0, 225), breaks = seq(from = 0, to = 225, by = 75)) + coord_flip() + ggtitle("ETNP Oxygen Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
 
 #PHOSPHATE
 PO4data <- na.omit(interp[interp$variable == 'PO4',])
@@ -147,7 +147,7 @@ jacdummy <- interp[1:length(levels(interp$cruise)),]
 jacdummy[,] <- NA
 jacdummy$cruise <- levels(interp$cruise)
 
-ggplot() + geom_line(aes(DepthBin, value, group = station), data = PO4data, col = 'pink') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgPO4, aes(DepthBin, V1), color = 'violetred1', lwd = 0.75) + geom_vline(aes(xintercept = z), hlinePO4, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[PO4] umol', limits = c(0, 4)) + ggtitle("ETNP Phosphate Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
+ggplot() + geom_line(aes(DepthBin, value, group = station), data = PO4data, col = 'pink') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgPO4, aes(DepthBin, V1), color = 'violetred1', lwd = 0.75) + geom_vline(aes(xintercept = z), hlinePO4, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[PO4] umol/kg', limits = c(0, 4)) + ggtitle("ETNP Phosphate Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
 
 #SILICATE
 SiO4data <- na.omit(interp[interp$variable == 'SiO4',])
@@ -158,7 +158,7 @@ SiO4depth <- ddply(.data = avgSiO4, .variables = c('cruise'), function(df) SiO4d
 
 hlineSiO4 <- data.frame(z = c(SiO4depth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
 
-ggplot() + geom_line(aes(DepthBin, value, group = station), data = SiO4data, col = 'peachpuff2') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgSiO4, aes(DepthBin, V1), color = 'tan4', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineSiO4, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[SiO4] umol', limits = c(0, 100), breaks = seq(from = 0, to = 100, by = 25)) + ggtitle("ETNP Silicate Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
+ggplot() + geom_line(aes(DepthBin, value, group = station), data = SiO4data, col = 'peachpuff2') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgSiO4, aes(DepthBin, V1), color = 'tan4', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineSiO4, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[SiO4] umol/kg', limits = c(0, 100), breaks = seq(from = 0, to = 100, by = 25)) + ggtitle("ETNP Silicate Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
 
 #NITRITE
 NO2data <- na.omit(interp[interp$variable == 'NO2',])
@@ -171,7 +171,7 @@ hlineNO2 <- data.frame(z = c(NO2depth$topNO2, NO2depth$bottNO2), cruise = c('TGT
 
 NO2data2 <- rbind(NO2data, jacdummy)
 
-ggplot() + geom_line(aes(DepthBin, value, group = station), data = NO2data2, col = 'yellowgreen') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgNO2, aes(DepthBin, V1), color = 'springgreen4', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineNO2, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[NO2] umol', limits = c(0, 8)) + ggtitle("ETNP Nitrite Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
+ggplot() + geom_line(aes(DepthBin, value, group = station), data = NO2data2, col = 'yellowgreen') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgNO2, aes(DepthBin, V1), color = 'springgreen4', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineNO2, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[NO2] umol/kg', limits = c(0, 8)) + ggtitle("ETNP Nitrite Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
 
 #NITRATE
 NO3data <- na.omit(interp[interp$variable == 'NO3',])
@@ -182,7 +182,7 @@ NO3depth <- ddply(.data = avgNO3, .variables = c('cruise'), function(df) NO3dept
 
 hlineNO3 <- data.frame(z = c(NO3depth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
 
-ggplot() + geom_line(aes(DepthBin, value, group = station), data = NO3data, col = 'thistle3') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgNO3, aes(DepthBin, V1), color = 'thistle4', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineNO3, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[NO3] umol', limits = c(0, 50)) + ggtitle("ETNP Nitrate Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
+ggplot() + geom_line(aes(DepthBin, value, group = station), data = NO3data, col = 'thistle3') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgNO3, aes(DepthBin, V1), color = 'thistle4', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineNO3, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[NO3] umol/kg', limits = c(0, 50)) + ggtitle("ETNP Nitrate Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
 
 #AMMONIUM
 NH4data <- na.omit(interp[interp$variable == 'NH4',])
@@ -195,7 +195,7 @@ hlineNH4 <- data.frame(z = c(NH4depth$topIdx), cruise = c('TN278', 'HOMZ16'))
 
 NH4data2 <- rbind(NH4data, jacdummy)
 
-ggplot() + geom_line(aes(DepthBin, value, group = station), data = NH4data2, col = 'sandybrown') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgNH4, aes(DepthBin, V1), color = 'darkorange2', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineNH4, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[NH4] umol', limits = c(0, 2), breaks = seq(from = 0, to = 2, by = 1)) + ggtitle("ETNP Ammonium Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
+ggplot() + geom_line(aes(DepthBin, value, group = station), data = NH4data2, col = 'sandybrown') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgNH4, aes(DepthBin, V1), color = 'darkorange2', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineNH4, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[NH4] umol/kg', limits = c(0, 2), breaks = seq(from = 0, to = 2, by = 1)) + ggtitle("ETNP Ammonium Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
 
 #TEMP
 tempdata <- na.omit(interp[interp$variable == 'temp',])

@@ -233,21 +233,27 @@ samplesCTD <- unique(subset(ctdamot, variable == 'fluorescence', select = c(dept
 # The oxycline, specifically O2 < 3uM and O2< 1uM are displayed as thick lines
 # Dotted lines indicate CTD transect.
 
-fluamstoxyP <- ggplot(subset(ctdamotInt2, variable == 'fluorescence'), aes(time, depth)) +
-  geom_tile(aes(fill = log10(value))) +
-  scale_y_reverse(limits = c(110, 0), breaks = seq(from = 0, to = 110, by = 20)) +
-  scale_x_datetime(limits = c(t0,t1),
+
+fluodata <- ctdamotInt2[ctdamotInt2$variable == 'fluorescence',]
+head(fluodata)
+head(samplesCTD)
+head(ctdamot)
+
+fluamstoxyP <- ggplot(subset(ctdamotInt2, variable == 'fluorescence'), aes(time, depth)) + #look in ctdamotInt2$fluo and plot x = time, y = depth. this will give you a heat map of fluo
+  geom_tile(aes(fill = log10(value))) + #this code fills fluo in with (blue toned) color.. and whenever there is a neg value, it won't plot it since you cant plot numeros imaginarios (the neg value got log 10'd)
+  scale_y_reverse(limits = c(110, 0), breaks = seq(from = 0, to = 110, by = 20)) + #this code is for the x axis depth ticks
+  scale_x_datetime(limits = c(t0, t1), #this code is for the y axis date ticks
                    breaks = tseq,
                    labels = scales::date_format(format = '%b-%d: %H%M', tz = "US/Pacific")
   ) +
-  geom_point(data = samplesCTD, aes( x = time, y = depth), shape = ".") +
-  scale_fill_gradientn(colours = c("blue4", "blue1", "white", "green1", "green4"), values = rescale(c(-1, -.5, -.2 ,  .05, .5)), name = "Chlorophyll Fluorescence") +
-  geom_contour(data = subset(ctdamotInt2, variable == 'sigmaT'), aes(x = time, y = depth, z = (value), colour = ..level..)) +
-  geom_contour(data = subset(ctdamotInt2, variable == 'oxygen'), aes(x = time, y = depth, z = value),  breaks =  c(1, 3), size = 2, colour = 'gray20') +
-  geom_point(data = subset(ctdamot, variable == 'nh4'), aes(time, depth), shape = 1) +
-  geom_point(data = subset(ctdamot, variable == 'nh4'), aes(time, depth, size = log10(value))) +
-  labs(size = "log10([NH4])", colour = "sigmaTheta") +
-  theme(axis.text.x = element_text(angle = 0, size = 16),
+  geom_point(data = samplesCTD, aes( x = time, y = depth), shape = ".") + #samplesCTD is a data frame of depth, date, and time. i think this plots small vertical dots wherever there was a CTD cast... 
+  scale_fill_gradientn(colours = c("blue4", "blue1", "white", "green1", "green4"), values = rescale(c(-1, -.5, -.2 ,  .05, .5)), name = "Chlorophyll Fluorescence") + #this code makes the colors for the heat map of fluo.. it decides what values belong to what color... then we name the key "chl fluo"
+  geom_contour(data = subset(ctdamotInt2, variable == 'sigmaT'), aes(x = time, y = depth, z = (value), colour = ..level..)) + #sigmaT = density. this code is adding countour lines of density. plotting x, y, and z.  colour = ..level.. will give me blue tones, but i can change that to whatever color i want! 
+  geom_contour(data = subset(ctdamotInt2, variable == 'oxygen'), aes(x = time, y = depth, z = value),  breaks =  c(1, 3), size = 2, colour = 'gray20') + #this will give me thick oxygen contour lines. plotting x, y, and z. breaks = 1, 3 means ??????, size = 2 is the thickness of the line, and colour is the british version of color
+  geom_point(data = subset(ctdamot, variable == 'nh4'), aes(time, depth), shape = 1) + #here ctdamot is used instead of Int or Int2 probably because we don't need to plot the interpolated data? that was only for making the heat map/contours... here we are plotting x = depth, y = time, and shape = 1 is an OPEN CIRCLE
+  geom_point(data = subset(ctdamot, variable == 'nh4'), aes(time, depth, size = log10(value))) + #this adds extra circles to the vertical CTD cast circles. the size of the circle varies depending on the log10 value of the [NH4]
+  labs(size = "log10([NH4])", colour = "sigmaTheta") + #this added to the key to have circles and log10 values... so i think it's plotting a label for the dots (categorized by size) as "log10[NH4]" and a label for the heat map (categorized by colors) as "sigmaTheta"
+  theme(axis.text.x = element_text(angle = 0, size = 16), #and this just gives some edits to the font size and stuff
         axis.text.y = element_text(size = 16),
         text = element_text(size=20))
 fluamstoxyP
