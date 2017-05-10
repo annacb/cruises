@@ -5,18 +5,18 @@ library(plyr)
 
 
 #reading in the data
-cruisesDataFrame <- read.csv('allOMZcruises.csv')
-cruises <- subset(cruisesDataFrame, select = -c(date, time, bottDepth))
-skq2016combined <- read.csv('skq2016combined.csv')
-cruises16 <- subset(skq2016combined, select = -c(date, time, bottDepth))
-cruisesALL0 <- rbind(cruises, cruises16)  
-skq2016KrogslundNuts <- read.csv('krogslund_nutrients.csv')
-krogslund <- subset(skq2016KrogslundNuts, select = -c(date, time, bottDepth))
-cruisesALL1 <- rbind(cruises, cruises16, krogslund)
-cruisesALL2 <- subset(cruisesALL1, select = -c(dateNew, timeNew, datetime, lat, long, press))
+horakbakk_nuts <- read.csv('horakbakker_nutrients.csv')
+horakbakk_nuts2 <- subset(horakbakk_nuts, select = -c(date, time, bottDepth))
+skqCTDo <- read.csv('skq16CTDo.csv')
+skqCTDo2 <- subset(skqCTDo, select = -c(date, time, bottDepth))
+cruisesALL0 <- rbind(horakbakk_nuts2, skqCTDo2)  
+skq16krognuts <- read.csv('krogslund_nutrients.csv')
+skq16krognuts2 <- subset(skq16krognuts, select = -c(date, time, bottDepth))
+cruisesALL1 <- rbind(horakbakk_nuts2, skqCTDo2, skq16krognuts2)
+cruisesALL2 <- subset(cruisesALL1, select = -c(dateNew, timeNew, datetime, press))
 
 #melting data
-cruisesALLm <- data.frame(melt(cruisesALL2, id.vars = c('cruise', 'station', 'depth')))
+cruisesALLm <- data.frame(melt(cruisesALL2, id.vars = c('cruise', 'station', 'depth', 'lat', 'long')))
 
 #interpolating
 #WOA standard depths
@@ -27,6 +27,15 @@ by100 <- seq(2100, 9000, 100)
 stdDepths <- c(by5, by25, by50, by100)
 
 cruisesALLn <- na.omit(cruisesALLm)
+
+
+##
+cruisesALLn <- cruisesALLn[!(cruisesALLn$cruise == "TN278" & cruisesALLn$station == 2), ]
+cruisesALLn <- cruisesALLn[!(cruisesALLn$cruise == "TN278" & cruisesALLn$long < -111), ]
+cruisesALLn <- cruisesALLn[!(cruisesALLn$cruise == "TN278" & cruisesALLn$long > -109), ]
+cruisesALLn <- cruisesALLn[!(cruisesALLn$cruise == "TN278" & cruisesALLn$lat > 22.5), ]
+##
+
 
 #
 
@@ -44,7 +53,7 @@ interp <- ddply(.data = cruisesALLn, .variables = c('cruise', 'station', 'variab
 #making cruises in order by date
 levels(interp$cruise)
 
-interp$cruise <- factor(interp$cruise, levels = c('TGT001','TGT37', 'TGT66', 'P18N_31DSCG94_3', 'clivar', 'TN278', 'HOMZ16'), labels = c('TGT001','TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
+interp$cruise <- factor(interp$cruise, levels = c('TGT001','TGT37', 'TGT66', 'P18N_31DSCG94_3', 'clivar', 'TN278', 'SKQ'), labels = c('TGT001','TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'SKQ'))
 
 #functions to generate horizontal line
 #OXYGEN
@@ -85,7 +94,7 @@ NO2depthfx <- function(df) {
 
 #NITRATE
 NO3depthfx <- function(df) {
-  Idx <- which(df$V1 >= 25)
+  Idx <- which(df$V1 >= 15)
   firstIdx <- Idx[1]
   topIdx <- df$DepthBin[firstIdx]
   data.frame(cruise = df[1, 1], topIdx)
@@ -126,7 +135,7 @@ avgO2 <- ddply(.data = O2data, .variables = c('cruise', 'variable', 'DepthBin'),
 
 ODZdepths <- ddply(.data = avgO2, .variables = c('cruise'), function(df) ODZdepthfx(df))
 
-hlineO2 <- data.frame(z = c(ODZdepths$topODZ, ODZdepths$bottODZ), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16', 'TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
+hlineO2 <- data.frame(z = c(ODZdepths$topODZ, ODZdepths$bottODZ), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'SKQ', 'TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'SKQ'))
 
 ggplot() + geom_line(aes(DepthBin, value, group = station), data = O2data, col = 'skyblue1') + facet_wrap('cruise', nrow = 2) + geom_line(data = avgO2, aes(DepthBin, V1), color = 'darkblue', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineO2, lty = 5) + scale_x_reverse(limits = c(1250, 0), breaks = seq(from = 0, to = 1250, by = 250), name = 'Depth (m)') + scale_y_continuous(name = '[O2] umol/kg', limits = c(0, 225), breaks = seq(from = 0, to = 225, by = 75)) + coord_flip() + ggtitle("ETNP Oxygen Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
 
@@ -137,7 +146,7 @@ avgPO4 <- ddply(.data = PO4data, .variables = c('cruise', 'variable', 'DepthBin'
 
 PO4depth <- ddply(.data = avgPO4, .variables = c('cruise'), function(df) PO4depthfx(df))
 
-hlinePO4 <- data.frame(z = c(PO4depth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
+hlinePO4 <- data.frame(z = c(PO4depth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'SKQ'))
 
 # need to use 'jacdummy' variable to keep the other cruises included in the facets even though there is no data for them...
 # used for NO2 and NH4
@@ -156,7 +165,7 @@ avgSiO4 <- ddply(.data = SiO4data, .variables = c('cruise', 'variable', 'DepthBi
 
 SiO4depth <- ddply(.data = avgSiO4, .variables = c('cruise'), function(df) SiO4depthfx(df))
 
-hlineSiO4 <- data.frame(z = c(SiO4depth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
+hlineSiO4 <- data.frame(z = c(SiO4depth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'SKQ'))
 
 ggplot() + geom_line(aes(DepthBin, value, group = station), data = SiO4data, col = 'peachpuff2') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgSiO4, aes(DepthBin, V1), color = 'tan4', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineSiO4, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[SiO4] umol/kg', limits = c(0, 100), breaks = seq(from = 0, to = 100, by = 25)) + ggtitle("ETNP Silicate Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
 
@@ -167,7 +176,7 @@ avgNO2 <- ddply(.data = NO2data, .variables = c('cruise', 'variable', 'DepthBin'
 
 NO2depth <- ddply(.data = avgNO2, .variables = c('cruise'), function(df) NO2depthfx(df))
 
-hlineNO2 <- data.frame(z = c(NO2depth$topNO2, NO2depth$bottNO2), cruise = c('TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
+hlineNO2 <- data.frame(z = c(NO2depth$topNO2, NO2depth$bottNO2), cruise = c('TGT66', 'P18N', 'clivar', 'TN278', SKQ, 'TGT66', 'P18N', 'clivar', 'TN278', 'SKQ'))
 
 NO2data2 <- rbind(NO2data, jacdummy)
 
@@ -180,7 +189,7 @@ avgNO3 <- ddply(.data = NO3data, .variables = c('cruise', 'variable', 'DepthBin'
 
 NO3depth <- ddply(.data = avgNO3, .variables = c('cruise'), function(df) NO3depthfx(df))
 
-hlineNO3 <- data.frame(z = c(NO3depth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
+hlineNO3 <- data.frame(z = c(NO3depth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'SKQ'))
 
 ggplot() + geom_line(aes(DepthBin, value, group = station), data = NO3data, col = 'thistle3') + coord_flip() + facet_wrap('cruise', nrow = 2) + geom_line(data = avgNO3, aes(DepthBin, V1), color = 'thistle4', lwd = 0.75) + geom_vline(aes(xintercept = z), hlineNO3, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = '[NO3] umol/kg', limits = c(0, 50)) + ggtitle("ETNP Nitrate Concentration 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15)) 
 
@@ -191,7 +200,7 @@ avgNH4 <- ddply(.data = NH4data, .variables = c('cruise', 'variable', 'DepthBin'
 
 NH4depth <- ddply(.data = avgNH4, .variables = c('cruise'), function(df) NH4depthfx(df))
 
-hlineNH4 <- data.frame(z = c(NH4depth$topIdx), cruise = c('TN278', 'HOMZ16'))
+hlineNH4 <- data.frame(z = c(NH4depth$topIdx), cruise = c('TN278', 'SKQ'))
 
 NH4data2 <- rbind(NH4data, jacdummy)
 
@@ -204,7 +213,7 @@ avgtemp <- ddply(.data = tempdata, .variables = c('cruise', 'variable', 'DepthBi
 
 tempdepth <- ddply(.data = avgtemp, .variables = c('cruise'), function(df) tempdepthfx(df))
 
-hlinetemp <- data.frame(z = c(tempdepth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
+hlinetemp <- data.frame(z = c(tempdepth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'SKQ'))
 
 ggplot() + geom_line(aes(DepthBin, value, group = station), data = tempdata, col = 'tomato') + facet_wrap('cruise', nrow = 2) + geom_line(data = avgtemp, aes(DepthBin, V1), color = 'darkred', lwd = 0.75) + geom_vline(aes(xintercept = z), hlinetemp, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = 'Temp (˚C)', limits = c(0, 30)) + coord_flip() + ggtitle("ETNP Water Temperature 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15))
 
@@ -215,7 +224,7 @@ avgsal <- ddply(.data = saldata, .variables = c('cruise', 'variable', 'DepthBin'
 
 saldepth <- ddply(.data = avgsal, .variables = c('cruise'), function(df) saldepthfx(df))
 
-hlinesal <- data.frame(z = c(saldepth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'HOMZ16'))
+hlinesal <- data.frame(z = c(saldepth$topIdx), cruise = c('TGT001', 'TGT37', 'TGT66', 'P18N', 'clivar', 'TN278', 'SKQ'))
 
 ggplot() + geom_line(aes(DepthBin, value, group = station), data = saldata, col = 'grey') + facet_wrap('cruise', nrow = 2) + geom_line(data = avgsal, aes(DepthBin, V1), color = 'grey33', lwd = 0.75) + geom_vline(aes(xintercept = z), hlinesal, lty = 5) + scale_x_reverse(limits = c(500, 0), name = 'Depth (m)') + scale_y_continuous(name = 'Salinity (PSU)', limits = c(33, 35), breaks = seq(from = 33, to = 35, by = 1)) + coord_flip() + ggtitle("ETNP Salinity 1965 to 2017") + theme(plot.title = element_text(size = 15), axis.text = element_text(size = 12), axis.title = element_text(size = 15))
 
